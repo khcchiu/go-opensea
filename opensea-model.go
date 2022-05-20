@@ -23,8 +23,8 @@ type Address string
 type OrderDirection string
 
 var (
-	asc  OrderDirection = "asc"
-	desc OrderDirection = "desc"
+	Asc  OrderDirection = "asc"
+	Desc OrderDirection = "desc"
 )
 
 const NullAddress Address = "0x0000000000000000000000000000000000000000"
@@ -219,6 +219,7 @@ type Asset struct {
 	Decimals             int64          `json:"decimals" bson:"decimals"`
 	TokenMetadata        string         `json:"token_metadata" bson:"token_metadata"`
 	Traits               interface{}    `json:"traits" bson:"traits"`
+	LastSale             *Sale          `json:"last_sale"`
 }
 
 type AssetContract struct {
@@ -331,4 +332,20 @@ type CollectionSingle struct {
 	PrimaryAssetContracts []Contract     `json:"primary_asset_contracts" bson:"primary_asset_contracts"`
 	Traits                interface{}    `json:"traits" bson:"traits"`
 	Collection
+}
+
+type Sale struct {
+	Asset struct {
+		Decimals int    `json:"decimals"`
+		TokenID  string `json:"token_id"`
+	} `json:"asset"`
+	AssetBundle    interface{}   `json:"asset_bundle"`
+	EventType      string        `json:"event_type"`
+	EventTimestamp string        `json:"event_timestamp"`
+	AuctionType    interface{}   `json:"auction_type"`
+	TotalPrice     string        `json:"total_price"`
+	PaymentToken   *PaymentToken `json:"payment_token"`
+	Transaction    *Transaction  `json:"transaction"`
+	CreatedDate    string        `json:"created_date"`
+	Quantity       string        `json:"quantity"`
 }
