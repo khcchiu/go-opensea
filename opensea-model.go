@@ -20,6 +20,13 @@ func (n Number) Big() *big.Int {
 
 type Address string
 
+type OrderDirection string
+
+var (
+	asc  OrderDirection = "asc"
+	desc OrderDirection = "desc"
+)
+
 const NullAddress Address = "0x0000000000000000000000000000000000000000"
 
 func IsHexAddress(s string) bool {
@@ -185,6 +192,12 @@ type AssetResponse struct {
 	Assets []Asset `json:"assets" bson:"assets"`
 }
 
+type AssetsResponse struct {
+	Assets   []Asset `json:"assets" bson:"assets"`
+	Next     string  `json:"next" bson:"next"`
+	Previous string  `json:"previous" bson:"previous"`
+}
+
 type Asset struct {
 	ID                   int64          `json:"id" bson:"id"`
 	TokenID              string         `json:"token_id" bson:"token_id"`
@@ -264,6 +277,20 @@ type Collection struct {
 	TwitterUsername             string      `json:"twitter_username" bson:"twitter_username"`
 	InstagramUsername           string      `json:"instagram_username" bson:"instagram_username"`
 	WikiUrl                     string      `json:"wiki_url" bson:"wiki_url"`
+}
+
+type GetAssetsParams struct {
+	Owner                  Address
+	TokenIds               []string
+	Collection             string
+	CollectionSlug         string
+	CollectionEditor       string
+	OrderDirection         OrderDirection
+	AssetContractAddress   Address
+	AssetContractAddresses []Address
+	Limit                  int
+	Cursor                 string
+	IncludeOrders          bool
 }
 
 type StatResponse struct {

@@ -8,6 +8,8 @@ import (
 	"math/big"
 	"net"
 	"net/http"
+	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -48,29 +50,69 @@ func NewOpenseaRinkeby(apiKey string) (*Opensea, error) {
 	return o, nil
 }
 
-// TODO
-//func (o Opensea) GetAssets(params GetAssetsParams) (*AssetResponse, error) {
-//	ctx := context.TODO()
-//	return o.GetAssetsWithContext(ctx, params)
-//}
+func (o Opensea) GetAssets(params GetAssetsParams) (*AssetsResponse, error) {
+	ctx := context.TODO()
+	return o.GetAssetsWithContext(ctx, params)
+}
 
-// TODO
-//func (o Opensea) GetAssetsWithContext(ctx context.Context, params GetAssetsParams) (*AssetResponse, error) {
-//	path := fmt.Sprintf("/api/v1/assets")
-//	b, err := o.GetPath(ctx, path)
-//	if err != nil {
-//		return nil, err
-//	}
-//	ret := new(AssetResponse)
-//	return ret, json.Unmarshal(b, ret)
-//}
+func (o Opensea) GetAssetsWithContext(ctx context.Context, params GetAssetsParams) (*AssetsResponse, error) {
+	path := fmt.Sprintf("/api/v1/assets")
+	values := url.Values{}
+	if params.Owner != "" {
+		values.Set("owner", params.Owner.String())
+	}
+	if len(params.TokenIds) > 0 {
+		for _, tokenId := range params.TokenIds {
+			values.Add("token_id", tokenId)
+		}
+	}
+	if params.Collection != "" {
+		values.Set("collection", params.Collection)
+	}
+	if params.CollectionSlug != "" {
+		values.Set("collection_slug", params.CollectionSlug)
+	}
+	if params.CollectionEditor != "" {
+		values.Set("collection_editor", params.CollectionEditor)
+	}
+	if params.OrderDirection != "" {
+		values.Set("order_direction", string(params.OrderDirection))
+	}
+	if params.AssetContractAddress != "" {
+		values.Set("asset_contract_address", params.AssetContractAddress.String())
+	}
+	if len(params.AssetContractAddresses) > 0 {
+		for _, assetContractAddress := range params.AssetContractAddresses {
+			values.Add("asset_contract_addresses", assetContractAddress.String())
+		}
+	}
+	if params.Limit != 0 {
+		values.Set("limit", strconv.Itoa(params.Limit))
+	}
+	if params.Cursor != "" {
+		values.Set("cursor", params.Cursor)
+	}
+	if params.IncludeOrders {
+		values.Set("include_orders", "true")
+	}
+
+	b, err := o.GetPath(ctx, path + values.Encode())
+	if err != nil {
+		return nil, err
+	}
+	ret := new(AssetsResponse)
+	return ret, json.Unmarshal(b, ret)
+}
 
 func (o Opensea) GetSingleAsset(assetContractAddress string, tokenID *big.Int) (*Asset, error) {
 	ctx := context.TODO()
 	return o.GetSingleAssetWithContext(ctx, assetContractAddress, tokenID)
 }
 
-func (o Opensea) GetSingleAssetWithContext(ctx context.Context, assetContractAddress string, tokenID *big.Int) (*Asset, error) {
+func (o Opensea) GetSingleAssetWithContext(ctx context.Context, assetContractAddress string, tokenID *big.Int) (
+	*Asset,
+	error,
+) {
 	path := fmt.Sprintf("/api/v1/asset/%s/%s", assetContractAddress, tokenID.String())
 	b, err := o.GetPath(ctx, path)
 	if err != nil {
