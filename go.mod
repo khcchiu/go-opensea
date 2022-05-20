@@ -1,4 +1,4 @@
-module github.com/gsmachado/go-opensea
+module github.com/quintics-io/go-opensea
 
 go 1.17
 
