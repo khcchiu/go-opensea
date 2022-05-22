@@ -56,7 +56,7 @@ func (o Opensea) GetAssets(params GetAssetsParams) (*AssetsResponse, error) {
 }
 
 func (o Opensea) GetAssetsWithContext(ctx context.Context, params GetAssetsParams) (*AssetsResponse, error) {
-	path := fmt.Sprintf("/api/v1/assets")
+	path := "/api/v1/assets"
 	values := url.Values{}
 	if params.Owner != "" {
 		values.Set("owner", params.Owner.String())
@@ -96,7 +96,12 @@ func (o Opensea) GetAssetsWithContext(ctx context.Context, params GetAssetsParam
 		values.Set("include_orders", "true")
 	}
 
-	b, err := o.GetPath(ctx, path + values.Encode())
+	encodedValues := values.Encode()
+	if encodedValues != "" {
+		path += fmt.Sprintf("?%s", encodedValues)
+	}
+
+	b, err := o.GetPath(ctx, path)
 	if err != nil {
 		return nil, err
 	}
